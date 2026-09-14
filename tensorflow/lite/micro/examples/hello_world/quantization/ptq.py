@@ -93,7 +93,8 @@ def convert_quantized_tflite_model(source_model_dir, x_values):
     for i in range(num_samples):
       yield [x_values[i].reshape(1, 1)]
 
-  converter = tf.lite.TFLiteConverter.from_saved_model(source_model_dir)
+  converter = tf.lite.TFLiteConverter.from_keras_model(
+      tf.keras.models.load_model(os.path.join(source_model_dir, "model.keras")))
   converter.optimizations = [tf.lite.Optimize.DEFAULT]
   converter.target_spec.supported_ops = [tf.lite.OpsSet.TFLITE_BUILTINS_INT8]
   converter.inference_input_type = tf.int8
