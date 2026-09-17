@@ -181,6 +181,11 @@ ifneq ($(TOOLCHAIN), gcc)
   CC_WARNINGS += -Wshadow
 endif
 
+WERROR ?= 0
+ifeq ($(WERROR), 1)
+  CC_WARNINGS += -Werror
+endif
+
 COMMON_FLAGS := \
   -fno-unwind-tables \
   -fno-asynchronous-unwind-tables \
@@ -476,7 +481,9 @@ MICROLITE_LIB_PATH := $(LIBDIR)$(MICROLITE_LIB_NAME)
 
 CXX := $(TARGET_TOOLCHAIN_ROOT)$(TARGET_TOOLCHAIN_PREFIX)$(CXX_TOOL)
 CC := $(TARGET_TOOLCHAIN_ROOT)$(TARGET_TOOLCHAIN_PREFIX)$(CC_TOOL)
-AR := $(TARGET_TOOLCHAIN_ROOT)$(TARGET_TOOLCHAIN_PREFIX)$(AR_TOOL)
+ifeq ($(origin AR), default)
+  AR := $(TARGET_TOOLCHAIN_ROOT)$(TARGET_TOOLCHAIN_PREFIX)$(AR_TOOL)
+endif
 
 # The default Makefile target(all) must appear before any target,
 # which is compiled if there's no command-line arguments.
