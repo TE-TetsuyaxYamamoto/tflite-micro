@@ -367,6 +367,7 @@ endif
 THIRD_PARTY_TARGETS :=
 $(foreach DOWNLOAD,$(THIRD_PARTY_DOWNLOADS),$(eval $(call create_download_rule,$(DOWNLOAD))))
 third_party_downloads: $(THIRD_PARTY_TARGETS)
+	$(Q)python3 $(MAKEFILE_DIR)/download_dependencies.py --downloads_dir $(DOWNLOADS_DIR) --tensorflow_root "$(TENSORFLOW_ROOT)"
 
 # Validate valid options.
 ifeq (,$(filter $(OPTIMIZE_KERNELS_FOR),KERNELS_OPTIMIZED_FOR_SPEED KERNELS_OPTIMIZED_FOR_SIZE))
@@ -472,7 +473,9 @@ ALL_SRCS := \
 # 6. Build Rules and Targets
 # ==============================================================================
 
-.PHONY: all microlite build test integration_tests generated_micro_mutable_op_resolver \
+.PHONY: all microlite tflm libtflm \
+        build build_all build_tests build_examples build_benchmarks build_integration_tests \
+        test integration_tests generated_micro_mutable_op_resolver \
         clean clean_downloads list_gendir list_library_sources list_library_headers \
         list_third_party_sources list_third_party_headers list_generator_dir \
         third_party_downloads
@@ -508,6 +511,21 @@ $(patsubst %.S,%.o,$(patsubst %.cc,%.o,$(patsubst %.c,%.o,$(THIRD_PARTY_KERNEL_C
 MICROLITE_KERNEL_OBJS := $(addprefix $(KERNEL_OBJDIR), \
 $(patsubst %.S,%.o,$(patsubst %.cc,%.o,$(patsubst %.c,%.o,$(MICROLITE_CC_KERNEL_SRCS)))))
 
+$(GENERATED_SRCS_DIR)%_model_data.cc $(GENERATED_SRCS_DIR)%_model_data.h: %.tflite
+	$(Q)python3 $(TENSORFLOW_ROOT)tensorflow/lite/micro/tools/generate_cc_arrays.py $(GENERATED_SRCS_DIR) $< > /dev/null
+
+$(GENERATED_SRCS_DIR)%_image_data.cc $(GENERATED_SRCS_DIR)%_image_data.h: %.bmp
+	$(Q)python3 $(TENSORFLOW_ROOT)tensorflow/lite/micro/tools/generate_cc_arrays.py $(GENERATED_SRCS_DIR) $< > /dev/null
+
+$(GENERATED_SRCS_DIR)%_audio_data.cc $(GENERATED_SRCS_DIR)%_audio_data.h: %.wav
+	$(Q)python3 $(TENSORFLOW_ROOT)tensorflow/lite/micro/tools/generate_cc_arrays.py $(GENERATED_SRCS_DIR) $< > /dev/null
+
+$(GENERATED_SRCS_DIR)%_test_data.cc $(GENERATED_SRCS_DIR)%_test_data.h: %.csv
+	$(Q)python3 $(TENSORFLOW_ROOT)tensorflow/lite/micro/tools/generate_cc_arrays.py $(GENERATED_SRCS_DIR) $< > /dev/null
+
+$(GENERATED_SRCS_DIR)%_test_data.cc $(GENERATED_SRCS_DIR)%_test_data.h: %.npy
+	$(Q)python3 $(TENSORFLOW_ROOT)tensorflow/lite/micro/tools/generate_cc_arrays.py $(GENERATED_SRCS_DIR) $< > /dev/null
+
 $(CORE_OBJDIR)%.o: %.cc $(THIRD_PARTY_TARGETS)
 	$(Q)$(MKDIR_P) $(dir $@)
 	$(Q)$(CXX) $(CXXFLAGS) $(CORE_OPTIMIZATION_LEVEL) $(INCLUDES) -c $< -o $@
@@ -532,15 +550,15 @@ $(THIRD_PARTY_OBJDIR)%.o: %.S $(THIRD_PARTY_TARGETS)
 	$(Q)$(MKDIR_P) $(dir $@)
 	$(Q)$(CC) $(CCFLAGS) $(CORE_OPTIMIZATION_LEVEL) $(INCLUDES) -c $< -o $@
 
-$(THIRD_PARTY_KERNEL_OBJDIR)%.o: %.cc $(THIRD_PARTY_KERNEL_TARGETS)
+$(THIRD_PARTY_KERNEL_OBJDIR)%.o: %.cc $(THIRD_PARTY_TARGETS)
 	$(Q)$(MKDIR_P) $(dir $@)
 	$(Q)$(CXX) $(CXXFLAGS) $(THIRD_PARTY_KERNEL_OPTIMIZATION_LEVEL) $(INCLUDES) -c $< -o $@
 
-$(THIRD_PARTY_KERNEL_OBJDIR)%.o: %.c $(THIRD_PARTY_KERNEL_TARGETS)
+$(THIRD_PARTY_KERNEL_OBJDIR)%.o: %.c $(THIRD_PARTY_TARGETS)
 	$(Q)$(MKDIR_P) $(dir $@)
 	$(Q)$(CC) $(CCFLAGS) $(THIRD_PARTY_KERNEL_OPTIMIZATION_LEVEL) $(INCLUDES) -c $< -o $@
 
-$(THIRD_PARTY_KERNEL_OBJDIR)%.o: %.S $(THIRD_PARTY_KERNEL_TARGETS)
+$(THIRD_PARTY_KERNEL_OBJDIR)%.o: %.S $(THIRD_PARTY_TARGETS)
 	$(Q)$(MKDIR_P) $(dir $@)
 	$(Q)$(CC) $(CCFLAGS) $(THIRD_PARTY_KERNEL_OPTIMIZATION_LEVEL) $(INCLUDES) -c $< -o $@
 
@@ -557,6 +575,8 @@ $(KERNEL_OBJDIR)%.o: %.S $(THIRD_PARTY_TARGETS)
 	$(Q)$(CC) $(CCFLAGS) $(KERNEL_OPTIMIZATION_LEVEL) $(INCLUDES) -c $< -o $@
 
 microlite: $(MICROLITE_LIB_PATH)
+tflm: $(MICROLITE_LIB_PATH)
+libtflm: $(MICROLITE_LIB_PATH)
 
 # Gathers together all the objects we've compiled into a single '.a' archive.
 $(MICROLITE_LIB_PATH): $(MICROLITE_LIB_OBJS) $(MICROLITE_KERNEL_OBJS) $(MICROLITE_THIRD_PARTY_OBJS) $(MICROLITE_THIRD_PARTY_KERNEL_OBJS) $(MICROLITE_CUSTOM_OP_OBJS)
@@ -604,8 +624,17 @@ integration_tests: $(MICROLITE_INTEGRATION_TEST_TARGETS)
 generated_micro_mutable_op_resolver: $(MICROLITE_GEN_OP_RESOLVER_TEST_TARGETS)
 endif
 
-# Just build the test targets
+# Build targets for each tier
+build_tests: $(MICROLITE_TEST_BINARIES)
+build_examples: $(MICROLITE_EXAMPLE_BINARIES)
+build_benchmarks: $(MICROLITE_BENCHMARK_BINARIES)
+build_integration_tests: $(MICROLITE_INTEGRATION_TEST_BINARIES)
+
+# Standard aggregate build (library + unit/example tests + standalone examples & benchmarks)
 build: $(MICROLITE_BUILD_TARGETS)
+
+# Full aggregate build including heavy integration test suites
+build_all: $(MICROLITE_BUILD_TARGETS) $(MICROLITE_INTEGRATION_TEST_BINARIES)
 
 list_gendir:
 	@echo $(GENDIR)
