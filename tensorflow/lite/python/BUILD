@@ -11,7 +11,7 @@ package(
 
 flatbuffer_py_library(
     name = "schema_py",
-    srcs = ["//tensorflow/compiler/mlir/lite/schema:schema.fbs"],
+    srcs = ["//tensorflow/lite/schema:schema.fbs"],
 )
 
 py_library(
@@ -20,6 +20,5 @@ py_library(
     visibility = ["//:__subpackages__"],
     deps = [
         requirement("flatbuffers"),
-        requirement("tensorflow"),
     ],
 )

@@ -69,6 +69,10 @@ tflm_py_binary(
 tflm_py_test(
     name = "requantize_flatbuffer_test",
     srcs = ["requantize_flatbuffer_test.py"],
+    data = [
+        "simple_fc_int16.tflite",
+        "simple_fc_int8.tflite",
+    ],
     main = "requantize_flatbuffer_test.py",
     tags = [
         "noasan",
@@ -79,7 +83,6 @@ tflm_py_test(
     deps = [
         ":requantize_flatbuffer",
         requirement("numpy"),
-        requirement("tensorflow"),
         "//python/tflite_micro:runtime",
     ],
 )
@@ -152,9 +155,6 @@ cc_binary(
     target_compatible_with = INCOMPATIBLE_WITH_WINDOWS,
     deps = [
         ":layer_by_layer_schema",
-        "//tensorflow/lite/c:c_api_types",
-        "//tensorflow/lite/c:common",
-        "//tensorflow/lite/kernels:op_macros",
         "//tensorflow/lite/micro:micro_allocator",
         "//tensorflow/lite/micro:micro_context",
         "//tensorflow/lite/micro:micro_framework",
@@ -162,7 +162,10 @@ cc_binary(
         "//tensorflow/lite/micro:micro_resource_variable",
         "//tensorflow/lite/micro:micro_utils",
         "//tensorflow/lite/micro:op_resolvers",
+        "//tensorflow/lite/micro/c:c_api_types",
+        "//tensorflow/lite/micro/c:common",
         "//tensorflow/lite/micro/kernels:kernel_util",
+        "//tensorflow/lite/micro/kernels:op_macros",
         "//tensorflow/lite/micro/tools/benchmarking:op_resolver",
         "//tensorflow/lite/schema:schema_fbs",
         "@flatbuffers",
@@ -193,7 +196,6 @@ tflm_py_test(
     target_compatible_with = INCOMPATIBLE_WITH_WINDOWS,
     deps = [
         ":tflm_model_transforms_lib",
-        requirement("tensorflow"),
         "//tensorflow/lite/micro/examples/recipes:resource_variables_lib",
     ],
 )
