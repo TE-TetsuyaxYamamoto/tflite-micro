@@ -15,8 +15,8 @@ limitations under the License.
 #ifndef TENSORFLOW_LITE_MICRO_KERNELS_HEXAGON_HEXAGON_FULLY_CONNECTED_H_
 #define TENSORFLOW_LITE_MICRO_KERNELS_HEXAGON_HEXAGON_FULLY_CONNECTED_H_
 
-#include "tensorflow/lite/micro/c/builtin_op_data.h"
-#include "tensorflow/lite/micro/c/common.h"
+#include "tensorflow/lite/micro/builtin_op_data.h"
+#include "tensorflow/lite/micro/micro_common.h"
 #include "tensorflow/lite/micro/kernels/fully_connected.h"
 #include "tensorflow/lite/micro/kernels/internal/types.h"
 
@@ -25,7 +25,10 @@ namespace micro {
 
 struct HexagonOpDataFullyConnected {
   struct OpDataFullyConnected reference_op_data;
-  void* hexagon_data;
+  int32_t* converted_bias;
+  int input_u8_scratch_index;
+  int output_s32_scratch_index;
+  int optimizable;
 };
 
 void* HexagonFullyConnectedInit(TfLiteContext* context, const char* buffer,

@@ -64,6 +64,8 @@ def build_generated_headers(repo_root):
     "//tensorflow/lite/micro:micro_framework",
     "//tensorflow/lite/micro/tools:layer_by_layer_schema",
     "//tensorflow/lite/micro/benchmarks:keyword_scrambled_model_data",
+    "//tensorflow/lite/micro/examples/person_detection:person_detect_model_data",
+    "//tensorflow/lite/micro/tools/gen_micro_mutable_op_resolver:generate_person_detect_op_resolver_hdr",
   ]
   print(f"Building targets for headers: {' '.join(targets)}...")
   subprocess.run(["bazel", "build"] + targets, cwd=repo_root, check=True)
@@ -73,7 +75,7 @@ def setup_external_symlink(repo_root):
   """Symlinks 'external' to Bazel's execution_root/external.
 
   In Bazel 8 (bzlmod), external headers are referenced via paths like
-  '-iquote external/+_repo_rules+gemmlowp'. Bazel creates this external/
+  '-iquote external/flatbuffers+'. Bazel creates this external/
   directory in execution_root, not the workspace root. Creating this symlink
   allows Clang tooling running from workspace root to resolve external headers.
   """

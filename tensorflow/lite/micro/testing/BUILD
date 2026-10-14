@@ -1,12 +1,12 @@
 load("//python:py_rules.bzl", "tflm_py_binary", "tflm_py_library")
 load(
-    "//tensorflow:extra_rules.bzl",
-    "tflm_kernel_friends",
-)
-load(
     "//tensorflow/lite/micro:build_def.bzl",
     "tflm_cc_library",
     "tflm_cc_test",
+)
+load(
+    "//tensorflow/lite/micro:extra_rules.bzl",
+    "tflm_kernel_friends",
 )
 
 package(
@@ -42,12 +42,12 @@ tflm_cc_library(
     ],
     deps = [
         "//tensorflow/lite/micro:debug_log",
+        "//tensorflow/lite/micro:micro_common",
         "//tensorflow/lite/micro:micro_framework",
         "//tensorflow/lite/micro:micro_log",
         "//tensorflow/lite/micro:micro_utils",
         "//tensorflow/lite/micro:system_setup",
         "//tensorflow/lite/micro:test_helpers",
-        "//tensorflow/lite/micro/c:common",
     ],
 )
 

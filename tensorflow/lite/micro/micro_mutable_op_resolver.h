@@ -20,8 +20,8 @@ limitations under the License.
 
 #include "signal/micro/kernels/irfft.h"
 #include "signal/micro/kernels/rfft.h"
-#include "tensorflow/lite/micro/c/common.h"
 #include "tensorflow/lite/micro/compatibility.h"
+#include "tensorflow/lite/micro/flatbuffer_conversions.h"
 #include "tensorflow/lite/micro/kernels/add.h"
 #include "tensorflow/lite/micro/kernels/batch_matmul.h"
 #include "tensorflow/lite/micro/kernels/conv.h"
@@ -39,12 +39,12 @@ limitations under the License.
 #include "tensorflow/lite/micro/kernels/svdf.h"
 #include "tensorflow/lite/micro/kernels/transpose_conv.h"
 #include "tensorflow/lite/micro/kernels/unidirectional_sequence_lstm.h"
+#include "tensorflow/lite/micro/micro_common.h"
 #include "tensorflow/lite/micro/micro_log.h"
 #include "tensorflow/lite/micro/micro_op_resolver.h"
-#include "tensorflow/lite/micro/tflite_bridge/flatbuffer_conversions_bridge.h"
-#include "tensorflow/lite/schema/schema_generated.h"
 
 namespace tflite {
+namespace micro {
 TFLMRegistration* Register_DETECTION_POSTPROCESS();
 
 template <unsigned int tOpCount>
@@ -250,7 +250,7 @@ class MicroMutableOpResolver : public MicroOpResolver {
 
   TfLiteStatus AddDetectionPostprocess() {
     return AddCustom("TFLite_Detection_PostProcess",
-                     tflite::Register_DETECTION_POSTPROCESS());
+                     Register_DETECTION_POSTPROCESS());
   }
 
   TfLiteStatus AddDiv(
@@ -780,6 +780,11 @@ class MicroMutableOpResolver : public MicroOpResolver {
   unsigned int num_builtin_ops_ = 0;
 };
 
-};  // namespace tflite
+}  // namespace micro
+
+using micro::MicroMutableOpResolver;
+using micro::Register_DETECTION_POSTPROCESS;
+
+}  // namespace tflite
 
 #endif  // TENSORFLOW_LITE_MICRO_MICRO_MUTABLE_OP_RESOLVER_H_

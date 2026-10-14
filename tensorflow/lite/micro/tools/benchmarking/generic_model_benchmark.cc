@@ -25,8 +25,7 @@ limitations under the License.
 #include <random>
 #include <type_traits>
 
-#include "tensorflow/lite/micro/c/c_api_types.h"
-#include "tensorflow/lite/micro/c/common.h"
+#include "tensorflow/lite/micro/micro_common.h"
 #include "tensorflow/lite/micro/micro_context.h"
 #include "tensorflow/lite/micro/micro_log.h"
 #include "tensorflow/lite/micro/micro_mutable_op_resolver.h"
@@ -38,7 +37,6 @@ limitations under the License.
 #include "tensorflow/lite/micro/tools/benchmarking/metrics.h"
 #include "tensorflow/lite/micro/tools/benchmarking/op_resolver.h"
 #include "tensorflow/lite/micro/tools/benchmarking/show_meta_data.h"
-#include "tensorflow/lite/schema/schema_generated.h"
 
 #if defined(GENERIC_BENCHMARK_USING_BUILTIN_MODEL)
 #if !defined(GENERIC_BENCHMARK_MODEL_HEADER_PATH)

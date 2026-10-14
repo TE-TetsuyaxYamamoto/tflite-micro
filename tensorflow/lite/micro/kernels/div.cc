@@ -15,11 +15,11 @@ limitations under the License.
 
 #include "tensorflow/lite/micro/kernels/internal/reference/div.h"
 
-#include "tensorflow/lite/micro/c/common.h"
 #include "tensorflow/lite/micro/kernels/internal/quantization_util.h"
 #include "tensorflow/lite/micro/kernels/internal/reference/process_broadcast_shapes.h"
 #include "tensorflow/lite/micro/kernels/internal/types.h"
 #include "tensorflow/lite/micro/kernels/kernel_util.h"
+#include "tensorflow/lite/micro/micro_common.h"
 #include "tensorflow/lite/micro/micro_log.h"
 
 namespace tflite {
@@ -53,8 +53,9 @@ TfLiteStatus CalculateOpDataDiv(TfLiteContext* context, TfLiteTensor* input1,
     TF_LITE_ENSURE_STATUS(CalculateActivationRangeQuantized(
         context, params->activation, output, &data->output_activation_min,
         &data->output_activation_max));
-    const double real_multiplier = static_cast<double>(
-        input1->params.scale / (input2->params.scale * output->params.scale));
+    const double real_multiplier = static_cast<double>(input1->params.scale) /
+                                   (static_cast<double>(input2->params.scale) *
+                                    static_cast<double>(output->params.scale));
     QuantizeMultiplier(real_multiplier, &data->output_multiplier,
                        &data->output_shift);
     data->input1_zero_point = input1->params.zero_point;
@@ -66,7 +67,6 @@ TfLiteStatus CalculateOpDataDiv(TfLiteContext* context, TfLiteTensor* input1,
 }
 
 void* DivInit(TfLiteContext* context, const char* buffer, size_t length) {
-  TFLITE_DCHECK(context->AllocatePersistentBuffer != nullptr);
   return context->AllocatePersistentBuffer(context, sizeof(OpDataDiv));
 }
 

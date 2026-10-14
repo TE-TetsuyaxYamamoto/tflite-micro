@@ -15,13 +15,12 @@ tflm_cc_library(
     srcs = ["common.cc"],
     hdrs = [
         "common.h",
-        "optimized/neon_check.h",
+        "fixedpoint.h",
     ],
     deps = [
         ":compatibility",
         ":cppmath",
         ":types",
-        "@gemmlowp//:fixedpoint",
     ],
 )
 
@@ -29,6 +28,7 @@ tflm_cc_library(
     name = "compatibility",
     hdrs = ["compatibility.h"],
     deps = [
+        "//tensorflow/lite/micro:micro_compatibility",
         "//tensorflow/lite/micro/kernels:op_macros",
     ],
 )
@@ -54,18 +54,9 @@ tflm_cc_library(
     ],
 )
 
-tflm_cc_library(
+alias(
     name = "reference",
-    srcs = ["tensor_ctypes.cc"],
-    hdrs = [
-        "portable_tensor.h",
-        "tensor_ctypes.h",
-    ],
-    deps = [
-        ":compatibility",
-        ":types",
-        "//tensorflow/lite/micro/c:common",
-    ],
+    actual = ":tensor",
 )
 
 tflm_cc_library(
@@ -75,7 +66,6 @@ tflm_cc_library(
             "reference/*.cc",
         ],
         allow_empty = True,
-        exclude = ["reference/portable_tensor_utils.cc"],
     ),
     hdrs = glob([
         "reference/*.h",
@@ -90,11 +80,9 @@ tflm_cc_library(
         ":strided_slice_logic",
         ":tensor",
         ":types",
-        "//tensorflow/lite/micro/c:common",
+        "//tensorflow/lite/micro:micro_common",
         "//tensorflow/lite/micro/kernels:kernel_util",
         "//tensorflow/lite/micro/kernels:op_macros",
-        "@gemmlowp//:fixedpoint",
-        "@ruy//ruy/profiler:instrumentation",
     ],
 )
 
@@ -112,6 +100,7 @@ tflm_cc_library(
 
 tflm_cc_library(
     name = "tensor",
+    srcs = ["tensor_ctypes.cc"],
     hdrs = [
         "portable_tensor.h",
         "tensor_ctypes.h",
@@ -119,7 +108,7 @@ tflm_cc_library(
     deps = [
         ":compatibility",
         ":types",
-        "//tensorflow/lite/micro/c:common",
+        "//tensorflow/lite/micro:micro_common",
     ],
 )
 
@@ -131,7 +120,6 @@ tflm_cc_library(
     ],
     deps = [
         ":compatibility",
-        "//tensorflow/lite/micro/types:half",
     ],
 )
 
@@ -139,20 +127,15 @@ tflm_cc_library(
     name = "tensor_utils_no_eigen",
     srcs = [
         "portable_tensor_utils.cc",
-        "reference/portable_tensor_utils.cc",
-        "tensor_utils.cc",
     ],
     hdrs = [
         "portable_tensor_utils.h",
-        "reference/portable_tensor_utils.h",
-        "reference/portable_tensor_utils_impl.h",
     ],
     deps = [
         ":common",
         ":compatibility",
         ":cppmath",
-        "//tensorflow/lite/micro/c:common",
+        "//tensorflow/lite/micro:micro_common",
         "//tensorflow/lite/micro/kernels:op_macros",
-        "@gemmlowp//:fixedpoint",
     ],
 )

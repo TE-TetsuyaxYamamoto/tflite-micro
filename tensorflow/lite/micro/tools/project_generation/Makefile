@@ -20,6 +20,7 @@
 # make -j8 examples
 
 BUILD_TYPE :=
+DISABLE_EXCEPTIONS := true
 
 COMMON_FLAGS := \
   -fno-unwind-tables \
@@ -33,11 +34,9 @@ AR := ar
 
 INCLUDES := \
   -I. \
-  -I./third_party/gemmlowp \
   -I./third_party/flatbuffers/include \
   -I./third_party/kissfft \
-  -I./third_party/kissfft/tools \
-  -I./third_party/ruy
+  -I./third_party/kissfft/tools
 
 ifneq ($(TENSORFLOW_ROOT),)
   INCLUDES += -I$(TENSORFLOW_ROOT)
@@ -73,9 +72,12 @@ endif
 CXXFLAGS := \
   -std=c++17 \
   -fno-rtti \
-  -fno-exceptions \
   -fno-threadsafe-statics \
   $(COMMON_FLAGS)
+
+ifeq ($(DISABLE_EXCEPTIONS), true)
+  CXXFLAGS += -fno-exceptions
+endif
 
 CCFLAGS := \
   -std=c17 \

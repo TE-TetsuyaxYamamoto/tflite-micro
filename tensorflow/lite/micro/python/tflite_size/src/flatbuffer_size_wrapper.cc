@@ -18,9 +18,10 @@ limitations under the License.
 #include <pybind11/pybind11.h>
 
 #include "flatbuffer_size.h"
-#include "tensorflow/lite/schema/reflection/schema_generated.h"
+#include "tensorflow/lite/micro/schema/reflection/schema_generated.h"
 
 namespace tflite {
+namespace micro {
 
 FlatbufferSizeWrapper::~FlatbufferSizeWrapper() {}
 
@@ -35,4 +36,5 @@ std::string FlatbufferSizeWrapper::ConvertToJsonString(
   return output;
 }
 
+}  // namespace micro
 }  // namespace tflite
