@@ -54,6 +54,7 @@ build:ci --action_env=CC=clang
 build:ci --action_env=CXX=clang++
 build:ci --repo_env=CC=clang
 build:ci --repo_env=CXX=clang++
+build:ci --features=layering_check
 
 # Windows CI options
 build:windows_ci --config=_ci_base
@@ -87,7 +88,7 @@ build:asan --linkopt=-fsanitize=address
 # E.g., bazel build --config msan
 build:msan --config=_sanitizer_base
 build:msan --copt=-fsanitize=memory
-build:msan --copt=-DADDRESS_SANITIZER
+build:msan --copt=-DMEMORY_SANITIZER
 build:msan --linkopt=-fsanitize=memory
 
 # When building with the undefined behavior sanitizer

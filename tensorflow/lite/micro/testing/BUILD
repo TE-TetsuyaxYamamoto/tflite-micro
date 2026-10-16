@@ -10,19 +10,12 @@ load(
 )
 
 package(
-    # Disabling layering_check because of http://b/177257332
-    features = ["-layering_check"],
     licenses = ["notice"],
 )
 
 package_group(
     name = "tflite_micro",
     packages = ["//..."],
-)
-
-package_group(
-    name = "microfrontend",
-    packages = ["//tensorflow/lite/experimental/microfrontend/..."],
 )
 
 package_group(
@@ -48,6 +41,32 @@ tflm_cc_library(
         "//tensorflow/lite/micro:micro_utils",
         "//tensorflow/lite/micro:system_setup",
         "//tensorflow/lite/micro:test_helpers",
+    ],
+)
+
+tflm_cc_library(
+    name = "test_all_op_resolver",
+    hdrs = [
+        "test_all_op_resolver.h",
+    ],
+    visibility = [
+        ":kernel_test_friends",
+        ":tflite_micro",
+    ],
+    deps = [
+        "//tensorflow/lite/micro:micro_common",
+        "//tensorflow/lite/micro:op_resolvers",
+    ],
+)
+
+tflm_cc_test(
+    name = "test_all_op_resolver_test",
+    srcs = [
+        "test_all_op_resolver_test.cc",
+    ],
+    deps = [
+        ":micro_test",
+        ":test_all_op_resolver",
     ],
 )
 

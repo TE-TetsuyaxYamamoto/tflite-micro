@@ -22,7 +22,6 @@ load(
 load("//tools:expand_stamp_vars.bzl", "expand_stamp_vars")
 
 package(
-    features = ["-layering_check"],
     licenses = ["notice"],
 )
 
@@ -42,7 +41,6 @@ tflm_cc_library(
     visibility = [
         ":op_resolver_friends",
         "//tensorflow/lite/micro/integration_tests:__subpackages__",
-        "//tensorflow/lite/micro/python/interpreter/src:__subpackages__",
     ],
     deps = [
         "//tensorflow/lite/micro:micro_compatibility",
@@ -69,9 +67,14 @@ pybind_extension(
     target_compatible_with = INCOMPATIBLE_WITH_WINDOWS,
     deps = [
         ":python_ops_resolver",
+        "//tensorflow/lite/micro:micro_allocator",
+        "//tensorflow/lite/micro:micro_common",
+        "//tensorflow/lite/micro:micro_context",
         "//tensorflow/lite/micro:micro_framework",
+        "//tensorflow/lite/micro:micro_utils",
         "//tensorflow/lite/micro:op_resolvers",
         "//tensorflow/lite/micro:recording_allocators",
+        "//tensorflow/lite/micro/schema:schema_fbs",
         "@tflm_pip_deps//numpy:cc_headers",
     ],
 )
